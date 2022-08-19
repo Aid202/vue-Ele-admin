@@ -10,7 +10,7 @@
     >
       <div class="title-container">
         <h3 class="title">
-          <img src="@/assets/common/login-logo.png" alt="">
+          <img src="@/assets/common/login-logo.png" alt="" />
         </h3>
       </div>
 
@@ -71,16 +71,18 @@
 <script>
 // 校验手机号的方法
 import { validMobile } from '@/utils/validate'
-
+import { mapActions } from 'vuex'
 export default {
   name: 'Login',
   data() {
     const validateMobile = (rule, value, callback) => {
+      // 第一种写法
       // if (!validMobile(value)) {
       //   callback(new Error('请输入正确的手机号码'))
       // } else {
       //   callback()
       // }
+      // 第二种写法
       validMobile(value) ? callback() : callback(new Error('请输入正确的手机号码'))
     }
     return {
@@ -106,6 +108,7 @@ export default {
     }
   },
   methods: {
+    ...mapActions(['user/login']), // 引入方法
     showPwd() {
       if (this.passwordType === 'password') {
         this.passwordType = ''
@@ -117,20 +120,27 @@ export default {
       })
     },
     handleLogin() {
-      this.$refs.loginForm.validate(valid => {
-        if (valid) {
-          this.loading = true
-          this.$store.dispatch('user/login', this.loginForm).then(() => {
-            this.$router.push({ path: this.redirect || '/' })
+      this.$refs.loginForm.validate(async isOK => {
+        if (isOK) {
+          try {
+            this.loading = true
+            // 只有校验通过，才会调用action
+            // 强制等待 promise 执行成功
+            await this['user/login'](this.loginForm)
+            // 登录成功，跳转主页
+            // async 包裹的函数 实际上是一个 promise 对象
+            // await 下面都是执行成功的代码
+            this.$router.push('/')
+          } catch (err) {
+            console.log(err)
+          } finally {
+            // 不论执行 try 还说 catch 都会执行 finally
             this.loading = false
-          }).catch(() => {
-            this.loading = false
-          })
-        } else {
-          console.log('error submit!!')
-          return false
+          }
         }
       })
+      // ref 可以获取一个元素的dom对象
+      // ref 作用到组件上的时候，可以获取该组件的实例 this
     }
   }
 }
