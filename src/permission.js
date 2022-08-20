@@ -16,15 +16,22 @@ const whiteList = ['/login', '/404'] // 定义白名单
 // next() 放过
 // next(false) 跳转终止
 // next(地址) 跳转到某个地址
-router.beforeEach((to, from, next) => {
+router.beforeEach(async(to, from, next) => {
   nProgress.start() // start 开启进度条
   // 判断是否有 token
   if (store.getters.token) {
+    // 只有有 token 才能获取 资料
     // 如果有token
     if (to.path === '/login') {
       // 如果要访问的是登录页 (/login) 跳转至 主页
       next('/') // 跳转至主页
     } else {
+      // 只有放过，才获取用户资料
+      if (!store.getters.userId) {
+        // 如果没有 id 表示没有获取过用户资料
+        await store.dispatch('user/getUserInfo')
+        // 如果后续需要根据用户资料获取数据 必须改成 同步
+      }
       next() // 不去理会，留在原地
     }
   } else {

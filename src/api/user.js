@@ -21,3 +21,14 @@ export function getUserInfo() {
     method: 'post'
   })
 }
+
+/**
+ * 根据用户id获取用户详情
+ */
+export function getUserDataById(id) {
+  return request({
+    url: `/sys/user/${id}`
+    // method: 'get' 默认类型为get
+  })
+}
+

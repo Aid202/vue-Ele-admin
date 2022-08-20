@@ -12,6 +12,7 @@ import App from './App'
 import store from './store'
 import router from './router'
 
+import * as directives from '@/directives'
 import '@/icons' // icon
 import '@/permission' // permission control
 
@@ -19,9 +20,11 @@ import '@/permission' // permission control
 Vue.use(ElementUI, { locale })
 // 如果想要中文版 element-ui，按如下方式声明
 // Vue.use(ElementUI)
-
+// 注册自定义指令
 Vue.config.productionTip = false
-
+Object.keys(directives).forEach(key => { // 将所有的属性转换为数组
+  Vue.directive(key, directives[key])
+})
 new Vue({
   el: '#app',
   router,

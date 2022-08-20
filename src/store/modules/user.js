@@ -1,5 +1,5 @@
 import { getToken, setToken, removeToken } from '@/utils/auth'
-import { login, getUserInfo } from '@/api/user'
+import { login, getUserInfo, getUserDataById } from '@/api/user'
 // 状态
 const state = {
   token: getToken(), // 设置token为共享状态，初始化vuex的时候，都从缓冲中读取
@@ -36,8 +36,18 @@ const actions = {
   },
   async getUserInfo(context) {
     const result = await getUserInfo()
-    context.commit('setUserInfo', result) // 提交到 mutations
+    // 获取用户详情 用户详情数据
+    const baseInfo = await getUserDataById(result.userId)
+    // const obj = { ...result, ...baseInfo }
+    context.commit('setUserInfo', { ...result, ...baseInfo }) // 提交到 mutations
     return result // 为后期做权限留下伏笔
+  },
+  // 登出操作
+  logout(context) {
+    // 删除token
+    context.commit('removeToken') // 不仅仅删除了vuex，也删除了缓存
+    // 删除用户资料
+    context.commit('removeUserInfo')
   }
 }
 export default {
