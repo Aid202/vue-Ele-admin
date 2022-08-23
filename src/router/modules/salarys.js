@@ -11,7 +11,8 @@ export default {
     component: () => import('@/views/salarys'),
     // 路由的原信息 存储数据，可以放任意内容
     meta: {
-      title: '工资' // 因为 左侧导航 读取了 title属性
+      title: '工资', // 因为 左侧导航 读取了 title属性
+      icon: 'money'
     }
   }]
 }
