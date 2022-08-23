@@ -4,14 +4,14 @@
       <!-- 组织架构内容 头部 -->
       <el-card class="tree-card">
         <!-- 放置结构内容 -->
-        <tree-tools :tree-node="company" />
+        <tree-tools :tree-node="company" :is-root="true" />
         <!-- 放置一个 el=-ree -->
         <el-tree
           :data="departs"
           :props="defaultProps"
           :default-expand-all="true"
         >
-          <tree-tools slot-scope="{ data }" :tree-node="data" />
+          <tree-tools slot-scope="{ data }" :tree-node="data" @delDepts="getDepartments" />
         </el-tree>
       </el-card>
     </div>
@@ -21,6 +21,8 @@
 <script>
 import treeTools from './components/tree-tools.vue'
 import TreeTools from './components/tree-tools.vue'
+import { getDepartments } from '@/api/departments'
+import { tranListToTreeData } from '@/utils/index'
 export default {
   components: { treeTools },
   component: {
@@ -28,7 +30,7 @@ export default {
   },
   data() {
     return {
-      company: { name: '高高高有限公司 ', manager: '负责人'},
+      company: { name: '传智播客科技股份有限公司', manager: '负责人' },
       departs: [
         {
           name: '总裁办',
@@ -41,6 +43,15 @@ export default {
         label: 'name'
         // children: 'children'
       }
+    }
+  },
+  created() {
+    this.getDepartments()
+  },
+  methods: {
+    async getDepartments() {
+      const result = await getDepartments()
+      this.departs = tranListToTreeData(result.depts, '')// 要将其转换为树形结构
     }
   }
 }

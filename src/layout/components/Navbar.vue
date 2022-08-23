@@ -6,7 +6,7 @@
       @toggleClick="toggleSideBar"
     />
     <div class="app-breadcrumb">
-      高高高有限公司
+      传智播客科技有限公司
       <span class="breadBtn">测试版</span>
     </div>
     <!-- <breadcrumb class="breadcrumb-container" /> -->
