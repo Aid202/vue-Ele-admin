@@ -4,82 +4,42 @@
       <!-- 组织架构内容 头部 -->
       <el-card class="tree-card">
         <!-- 放置结构内容 -->
-        <el-row type="flex" justify="space-between">
-          <!-- 左侧 -->
-          <el-col>
-            <span>高高高有限公司</span>
-          </el-col>
-          <!-- 右侧 -->
-          <el-col :span="4">
-            <el-row type="flex" justify="end">
-              <el-col>负责人</el-col>
-              <el-col>
-                <!-- 下拉菜单 -->
-                <el-dropdown>
-                  <!-- 内容 -->
-                  <span>
-                    操作
-                    <i class="el-icon-arrow-down" />
-                  </span>
-                  <el-dropdown-menu slot="dropdown">
-                    <!-- 下拉选项 -->
-                    <el-dropdown-item>添加子部门</el-dropdown-item>
-                  </el-dropdown-menu>
-                </el-dropdown>
-              </el-col>
-            </el-row>
-          </el-col>
-          <!-- /右侧 -->
-        </el-row>
+        <tree-tools :tree-node="company" />
         <!-- 放置一个 el=-ree -->
-        <el-tree :data="data" :props="defaultProps" :default-expand-all="true" />
+        <el-tree
+          :data="departs"
+          :props="defaultProps"
+          :default-expand-all="true"
+        >
+          <tree-tools slot-scope="{ data }" :tree-node="data" />
+        </el-tree>
       </el-card>
     </div>
   </div>
 </template>
 
 <script>
+import treeTools from './components/tree-tools.vue'
+import TreeTools from './components/tree-tools.vue'
 export default {
+  components: { treeTools },
+  component: {
+    TreeTools
+  },
   data() {
     return {
-      data: [{
-        label: '一级 1',
-        children: [{
-          label: '二级 1-1',
-          children: [{
-            label: '三级 1-1-1'
-          }]
-        }]
-      }, {
-        label: '一级 2',
-        children: [{
-          label: '二级 2-1',
-          children: [{
-            label: '三级 2-1-1'
-          }]
-        }, {
-          label: '二级 2-2',
-          children: [{
-            label: '三级 2-2-1'
-          }]
-        }]
-      }, {
-        label: '一级 3',
-        children: [{
-          label: '二级 3-1',
-          children: [{
-            label: '三级 3-1-1'
-          }]
-        }, {
-          label: '二级 3-2',
-          children: [{
-            label: '三级 3-2-1'
-          }]
-        }]
-      }],
+      company: { name: '高高高有限公司 ', manager: '负责人'},
+      departs: [
+        {
+          name: '总裁办',
+          manager: '曹操',
+          children: [{ name: '董事会', manager: '孙权' }]
+        },
+        { name: '行政部', manager: '曹丕' },
+        { name: '人事部', manager: '曹植' }],
       defaultProps: {
-        children: 'children',
-        label: 'label'
+        label: 'name'
+        // children: 'children'
       }
     }
   }
