@@ -23,6 +23,7 @@ service.interceptors.request.use(config => {
       // token 超时,需要删除
       store.dispatch('user/logout')
       router.push('/login')
+      Message.error('登陆超时，请重新登录')
       return Promise.reject(new Error('token超时'))
     }
     config.headers['Authorization'] = `Bearer ${store.getters.token}`
