@@ -1,8 +1,8 @@
 <template>
   <!-- 放置弹层组件 -->
-  <el-dialog title="新增部门" :visible="showDialog">
+  <el-dialog title="新增部门" :visible="showDialog" @close="btnCancel">
     <!-- 表单数据 label-width设置所有标题的宽度 -->
-    <el-form :model="formData" label-width="120px" :rules="rules">
+    <el-form ref="deptForm" :model="formData" label-width="120px" :rules="rules">
       <el-form-item label="部门名称" prop="name">
         <el-input v-model="formData.name" style="width: 80%" placeholder="1-50个字符" />
       </el-form-item>
@@ -10,7 +10,10 @@
         <el-input v-model="formData.code" style="width: 80%" placeholder="1-50个字符" />
       </el-form-item>
       <el-form-item label="部门负责人" prop="manager">
-        <el-select v-model="formData.manager" style="width: 80%" placeholder="请选择" />
+        <el-select v-model="formData.manager" style="width:80%" placeholder="请选择" @focus="getEmployeeSimple">
+          <!-- 需要循环生成选项   这里做一下简单的处理 显示的是用户名 存的也是用户名-->
+          <el-option v-for="item in peoples" :key="item.id" :label="item.username" :value="item.username" />
+        </el-select>
       </el-form-item>
       <el-form-item label="部门介绍" prop="introduce">
         <el-input v-model="formData.introduce" style="width: 80%" placeholder="1-100个字符" type="textarea" :rows="3" />
@@ -19,15 +22,16 @@
     <!-- 确定和取消 -->
     <el-row slot="footer" type="flex" justify="center">
       <el-col :span="6">
-        <el-button size="small">取消</el-button>
-        <el-button size="small" type="primary">确定</el-button>
+        <el-button size="small" @click="btnCancel">取消</el-button>
+        <el-button size="small" type="primary" @click="btnOk">确定</el-button>
       </el-col>
     </el-row>
   </el-dialog>
 </template>
 
 <script>
-import { getDepartments } from '@/api/departments'
+import { getDepartments, addDepartments } from '@/api/departments'
+import { getEmployeeSimple } from '@/api/employees'
 export default {
   name: 'AddDept',
   props: {
@@ -58,7 +62,7 @@ export default {
       isRepeat ? callback(new Error(`组织架构下已经存在${value}这个编码`)) : callback()
     }
     return {
-      formData: {
+      formData: { // 表单的四个参数
         name: '',
         code: '',
         manager: '',
@@ -76,7 +80,39 @@ export default {
         manager: [{ required: true, message: '部门负责人不能为空', trigger: 'blur' }],
         introduce: [{ required: true, message: '部门介绍不能为空', trigger: 'blur' },
           { min: 1, max: 300, message: '部门介绍长度为1-300个字符', trigger: 'blur' }]
-      }
+      },
+      peoples: []
+    }
+  },
+  methods: {
+    async  getEmployeeSimple() {
+      this.peoples = await getEmployeeSimple()
+    },
+    btnOk() {
+      // 手动校验表单
+      this.$refs.deptForm.validate(async isOk => {
+        if (isOk) {
+          // 表单校验通过
+          // 将 id 设为 pid
+          await addDepartments({ ...this.formData, pid: this.treeNode.id })
+          // 告诉父组件，更新数据
+          // 触发一个自定义事件，告诉父组件
+          this.$emit('addDepts')
+          // 此时将修改showDialog的值
+          // update:props名称
+          // 关闭弹出层事件
+          this.$emit('update:showDialog', false)
+          this.$message('添加部门成功')
+          // 关闭dialog的时候会触发 el-dialog的close事件  所以这里不需要重复调用btnCancel事件
+        }
+      })
+    },
+    btnCancel() {
+      // 关闭弹层
+      this.$emit('update:showDialog', false)
+      // 清除之前的校验
+      // resetFields() 对整个表单进行重置，将所有字段值重置为初始值并移除校验结果
+      this.$refs.deptForm.resetFields()
     }
   }
 }

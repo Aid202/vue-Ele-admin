@@ -15,8 +15,8 @@
         </el-tree>
       </el-card>
     </div>
-    <!-- 放置新增弹层 -->
-    <add-dept :show-dialog="showDialog" :tree-node="node" />
+    <!-- 放置新增弹层 addDepts是子组件向父组件的自定义事件 -->
+    <add-dept :show-dialog.sync="showDialog" :tree-node="node" @addDepts="getDepartments" />
   </div>
 </template>
 
@@ -47,12 +47,16 @@ export default {
   methods: {
     async getDepartments() {
       const result = await getDepartments()
+      this.company = { name: result.companyName, manager: '负责人', id: '' }
       this.departs = tranListToTreeData(result.depts, '')// 要将其转换为树形结构
     },
     // 监听 tree-tool 触发的点击添加子部门事件
     addDepts(node) {
       this.showDialog = true // 显示弹层
       this.node = node
+    },
+    test(value) {
+      this.showDialog = value
     }
   }
 }
