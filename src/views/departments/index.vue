@@ -1,5 +1,5 @@
 <template>
-  <div class="dashboard-container">
+  <div v-loading="loading" class="dashboard-container">
     <div class="app-container">
       <!-- 组织架构内容 头部 -->
       <el-card class="tree-card">
@@ -11,12 +11,12 @@
           :props="defaultProps"
           :default-expand-all="true"
         >
-          <tree-tools slot-scope="{ data }" :tree-node="data" @addDepts="addDepts" @delDepts="getDepartments" />
+          <tree-tools slot-scope="{ data }" :tree-node="data" @addDepts="addDepts" @delDepts="getDepartments" @editDepts="editDepts" />
         </el-tree>
       </el-card>
     </div>
     <!-- 放置新增弹层 addDepts是子组件向父组件的自定义事件 -->
-    <add-dept :show-dialog.sync="showDialog" :tree-node="node" @addDepts="getDepartments" />
+    <add-dept ref="addDept" :show-dialog.sync="showDialog" :tree-node="node" @addDepts="getDepartments" />
   </div>
 </template>
 
@@ -38,7 +38,8 @@ export default {
         label: 'name'
       },
       showDialog: false, // 展示弹出框
-      node: null // 记录当前点击的node节点
+      node: null, // 记录当前点击的node节点
+      loading: false
     }
   },
   created() {
@@ -46,9 +47,11 @@ export default {
   },
   methods: {
     async getDepartments() {
+      this.loading = true
       const result = await getDepartments()
       this.company = { name: result.companyName, manager: '负责人', id: '' }
       this.departs = tranListToTreeData(result.depts, '')// 要将其转换为树形结构
+      this.loading = false
     },
     // 监听 tree-tool 触发的点击添加子部门事件
     addDepts(node) {
@@ -57,6 +60,14 @@ export default {
     },
     test(value) {
       this.showDialog = value
+    },
+    editDepts(node) {
+      // 打开弹层
+      this.showDialog = true
+      // 赋值操作的节点
+      this.node = node
+      // 调用获取部门详情得方法
+      this.$refs.addDept.getDepartDetail(node.id)
     }
   }
 }

@@ -36,3 +36,19 @@ export function addDepartments(data) {
     data
   })
 }
+/**
+ * 获取某个部门得详情
+ */
+export function getDepartDetail(id) {
+  return request({
+    url: `/company/department/${id}`
+  })
+}
+
+export function updateDepartments(data) {
+  return request({
+    url: `/company/department/${data.id}`,
+    method: 'PUT',
+    data
+  })
+}
