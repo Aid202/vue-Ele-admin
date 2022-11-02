@@ -5,6 +5,7 @@ export const imageerror = {
   inserted(dom, options) {
     // dom 表示当前指令作用的dom对象
     // dom 认为此时就是图片
+    dom.src = dom.src || options.value // 初始化时候，如果有值则赋值，如果没值，则需要就行默认值赋值
     // 当图片有地址，但地址未加载成功，
     // 会报错，触发 => onerror
     dom.onerror = function() {
@@ -12,6 +13,9 @@ export const imageerror = {
       // dom可以注册error事件
       dom.src = options.value
     }
+  },
+  componenUpload(dom, options) { // 该函数也是一个钩子函数，该函数会在当前指令作用的组件，更新数据完毕之后，赋值
+    dom.src = dom.src || options.value
   }
 }
 
